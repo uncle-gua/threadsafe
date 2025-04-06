@@ -2,101 +2,94 @@ package threadsafe
 
 import (
 	"sync"
-
-	"github.com/golang-collections/collections/stack"
 )
 
 // Stack is a thread-safe stack.
-type Stack struct {
-	s  *stack.Stack
-	mu sync.Mutex
+type Stack[T any] struct {
+	data []T
+	mu   sync.Mutex
 }
 
 // NewStack creates a new thread-safe stack.
-func NewStack() *Stack {
-	return &Stack{
-		s: stack.New(),
-	}
+func NewStack[T any]() *Stack[T] {
+	return &Stack[T]{data: []T{}}
 }
 
 // Push adds an element to the stack.
-func (s *Stack) Push(value interface{}) {
+func (s *Stack[T]) Push(value T) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.s.Push(value)
+	s.data = append(s.data, value)
 }
 
 // Pop removes and returns an element from the stack.
-func (s *Stack) Pop() (interface{}, bool) {
+func (s *Stack[T]) Pop() (value T, ok bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.s.Len() == 0 {
-		return nil, false
+	n := len(s.data)
+	if n > 0 {
+		value = s.data[n-1]
+		s.data = s.data[:n-1]
+		ok = true
 	}
-	return s.s.Pop(), true
+	return
 }
 
 // Len returns the number of elements in the stack.
-func (s *Stack) Len() int {
+func (s *Stack[T]) Len() int {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.s.Len()
+	return len(s.data)
 }
 
 // Peek returns the element at the top of the stack without removing it.
 // Example:
 //
 //	value, ok := s.Peek()
-func (s *Stack) Peek() (interface{}, bool) {
+func (s *Stack[T]) Peek() (value T, ok bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.s.Len() == 0 {
-		return nil, false
+	n := len(s.data)
+	if n > 0 {
+		value = s.data[n-1]
+		ok = true
 	}
-	return s.s.Peek(), true
+	return
 }
 
 // IsEmpty checks if the stack is empty.
 // Example:
 //
 //	isEmpty := s.IsEmpty()
-func (s *Stack) IsEmpty() bool {
+func (s *Stack[T]) IsEmpty() bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.s.Len() == 0
+	return len(s.data) == 0
 }
 
 // Clear removes all elements from the stack.
 // Example:
 //
 //	s.Clear()
-func (s *Stack) Clear() {
+func (s *Stack[T]) Clear() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.s = stack.New()
+	s.data = []T{}
 }
 
 // Values returns a slice of all elements in the stack.
 // Example:
 //
 //	values := s.Values()
-func (s *Stack) Values() []interface{} {
+func (s *Stack[T]) Values() []T {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Create a temporary slice to hold the values
-	values := make([]interface{}, 0, s.s.Len())
+	n := len(s.data)
+	values := make([]T, n)
 
-	// Temporarily pop all elements to capture them
-	length := s.s.Len()
-	for i := 0; i < length; i++ {
-		value := s.s.Pop()
-		values = append(values, value)
-	}
-
-	// Push the elements back to restore the original state
-	for i := len(values) - 1; i >= 0; i-- {
-		s.s.Push(values[i])
+	for i, value := range s.data {
+		values[n-i-1] = value
 	}
 
 	return values

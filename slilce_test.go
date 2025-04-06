@@ -1,18 +1,19 @@
-package threadsafe
+package threadsafe_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/uncle-gua/threadsafe"
 )
 
 func TestNewSlice(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	assert.Equal(t, 0, slice.Length())
 }
 
 func TestSliceAppend(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	slice.Append(42)
 	assert.Equal(t, 1, slice.Length())
 	value, ok := slice.Get(0)
@@ -21,7 +22,7 @@ func TestSliceAppend(t *testing.T) {
 }
 
 func TestSliceGetSet(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	slice.Append(1)
 	slice.Append(2)
 	slice.Append(3)
@@ -33,20 +34,20 @@ func TestSliceGetSet(t *testing.T) {
 }
 
 func TestSliceGetInvalidIndex(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	value, ok := slice.Get(10)
 	assert.False(t, ok)
 	assert.Equal(t, 0, value)
 }
 
 func TestSliceSetInvalidIndex(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	ok := slice.Set(10, 42)
 	assert.False(t, ok)
 }
 
 func TestSliceRemove(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	slice.Append(1)
 	slice.Append(2)
 	slice.Append(3)
@@ -59,13 +60,13 @@ func TestSliceRemove(t *testing.T) {
 }
 
 func TestSliceRemoveInvalidIndex(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	ok := slice.Remove(10)
 	assert.False(t, ok)
 }
 
 func TestSliceContains(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	slice.Append(1)
 	slice.Append(2)
 	slice.Append(3)
@@ -74,7 +75,7 @@ func TestSliceContains(t *testing.T) {
 }
 
 func TestSliceClear(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	slice.Append(1)
 	slice.Append(2)
 	slice.Append(3)
@@ -83,7 +84,7 @@ func TestSliceClear(t *testing.T) {
 }
 
 func TestSliceInsert(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	slice.Append(1)
 	slice.Append(2)
 	slice.Append(3)
@@ -96,13 +97,13 @@ func TestSliceInsert(t *testing.T) {
 }
 
 func TestSliceInsertInvalidIndex(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	ok := slice.Insert(10, 42)
 	assert.False(t, ok)
 }
 
 func TestSliceCopy(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	slice.Append(1)
 	slice.Append(2)
 	slice.Append(3)
@@ -116,7 +117,7 @@ func TestSliceCopy(t *testing.T) {
 }
 
 func TestSliceValues(t *testing.T) {
-	slice := NewSlice[int]()
+	slice := threadsafe.NewSlice[int]()
 	slice.Append(1)
 	slice.Append(2)
 	slice.Append(3)

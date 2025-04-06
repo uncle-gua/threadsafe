@@ -1,18 +1,19 @@
-package threadsafe
+package threadsafe_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/uncle-gua/threadsafe"
 )
 
 func TestNewQueue(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	assert.Equal(t, 0, queue.Len())
 }
 
 func TestQueueEnqueue(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	queue.Enqueue(42)
 	assert.Equal(t, 1, queue.Len())
 	value, ok := queue.Peek()
@@ -21,45 +22,65 @@ func TestQueueEnqueue(t *testing.T) {
 }
 
 func TestQueueDequeue(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	queue.Enqueue(42)
+	queue.Enqueue(43)
+	queue.Enqueue(44)
+
 	value, ok := queue.Dequeue()
 	assert.True(t, ok)
 	assert.Equal(t, 42, value)
+	assert.Equal(t, 2, queue.Len())
+
+	value, ok = queue.Dequeue()
+	assert.True(t, ok)
+	assert.Equal(t, 43, value)
+	assert.Equal(t, 1, queue.Len())
+
+	value, ok = queue.Dequeue()
+	assert.True(t, ok)
+	assert.Equal(t, 44, value)
+	assert.Equal(t, 0, queue.Len())
+
+	value, ok = queue.Dequeue()
+	assert.False(t, ok)
+	assert.Zero(t, value)
 	assert.Equal(t, 0, queue.Len())
 }
 
 func TestQueueDequeueEmpty(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	value, ok := queue.Dequeue()
 	assert.False(t, ok)
-	assert.Nil(t, value)
+	assert.Zero(t, value)
 }
 
 func TestQueuePeek(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	queue.Enqueue(42)
+	queue.Enqueue(43)
+	queue.Enqueue(44)
 	value, ok := queue.Peek()
 	assert.True(t, ok)
 	assert.Equal(t, 42, value)
 }
 
 func TestQueuePeekEmpty(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	value, ok := queue.Peek()
 	assert.False(t, ok)
-	assert.Nil(t, value)
+	assert.Zero(t, value)
 }
 
 func TestQueueLen(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	queue.Enqueue(42)
 	queue.Enqueue(43)
 	assert.Equal(t, 2, queue.Len())
 }
 
 func TestQueueIsEmpty(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	assert.True(t, queue.IsEmpty())
 	queue.Enqueue(42)
 	assert.False(t, queue.IsEmpty())
@@ -68,7 +89,7 @@ func TestQueueIsEmpty(t *testing.T) {
 }
 
 func TestQueueClear(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	queue.Enqueue(42)
 	queue.Enqueue(43)
 	queue.Clear()
@@ -77,7 +98,7 @@ func TestQueueClear(t *testing.T) {
 }
 
 func TestQueueValues(t *testing.T) {
-	queue := NewQueue()
+	queue := threadsafe.NewQueue[int]()
 	queue.Enqueue(1)
 	queue.Enqueue(2)
 	queue.Enqueue(3)

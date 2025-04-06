@@ -1,18 +1,19 @@
-package threadsafe
+package threadsafe_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/uncle-gua/threadsafe"
 )
 
 func TestNewMap(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	assert.Equal(t, 0, m.Length())
 }
 
 func TestMapSetGet(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	m.Set("key1", 42)
 	value, ok := m.Get("key1")
 	assert.True(t, ok)
@@ -20,14 +21,14 @@ func TestMapSetGet(t *testing.T) {
 }
 
 func TestMapGetNonExistentKey(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	value, ok := m.Get("nonexistent")
 	assert.False(t, ok)
 	assert.Equal(t, 0, value)
 }
 
 func TestMapDelete(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	m.Set("key1", 42)
 	m.Delete("key1")
 	value, ok := m.Get("key1")
@@ -36,14 +37,14 @@ func TestMapDelete(t *testing.T) {
 }
 
 func TestMapLength(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	m.Set("key1", 42)
 	m.Set("key2", 43)
 	assert.Equal(t, 2, m.Length())
 }
 
 func TestMapKeys(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	m.Set("key1", 42)
 	m.Set("key2", 43)
 	keys := m.Keys()
@@ -51,7 +52,7 @@ func TestMapKeys(t *testing.T) {
 }
 
 func TestMapValues(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	m.Set("key1", 42)
 	m.Set("key2", 43)
 	values := m.Values()
@@ -59,14 +60,14 @@ func TestMapValues(t *testing.T) {
 }
 
 func TestMapContains(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	m.Set("key1", 42)
 	assert.True(t, m.Contains("key1"))
 	assert.False(t, m.Contains("nonexistent"))
 }
 
 func TestMapClear(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	m.Set("key1", 42)
 	m.Set("key2", 43)
 	m.Clear()
@@ -74,7 +75,7 @@ func TestMapClear(t *testing.T) {
 }
 
 func TestMapCopy(t *testing.T) {
-	m := NewMap[string, int]()
+	m := threadsafe.NewMap[string, int]()
 	m.Set("key1", 42)
 	m.Set("key2", 43)
 	copyMap := m.Copy()
